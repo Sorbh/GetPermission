@@ -53,7 +53,7 @@ implementation 'in.unicodelabs.sorbh:getpermission:1.0.0'
  
 ## Contributing
 
-1. Fork it (<https://github.com/sorbh/kdgaugeView/fork>)
+1. Fork it (<https://github.com/sorbh/GetPermission/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
