@@ -1,5 +1,5 @@
-# KdGaugeView
-KDGaugeView is a simple and customizable gauge control for Android inspired by [LMGaugeView](https://github.com/lminhtm/LMGaugeView)
+# GetPermission
+GetPermission is the easiest way to manage Android Marshmallow and Nougat runtime permissions.
 
 ![open source](https://img.shields.io/badge/Open%20source-free-green.svg?longCache=true&style=flat-square)
 ![build number](https://img.shields.io/badge/Build-passing-green.svg?longCache=true&style=flat-square)
@@ -10,7 +10,11 @@ KDGaugeView is a simple and customizable gauge control for Android inspired by [
 
 # Motivation
 
-I need some clean Guage view for my Android application.
+Implementing runtime permissions forces the developer to add the code for granting (and checking if the permission has already been granted) in their Activities. At a time when everybody is trying to make their Activity classes lighter (with the help of Architecture Components by Google itself), this adds lots of boilerplate code in our activity.
+
+So I intend to solve this by using a separate module which handles all the runtime permission hassle and implement runtime permission in less code and sync manner.
+
+So this library handles all the permission handling logic.
 
 # Getting started
 
@@ -21,14 +25,14 @@ This library is posted in jCenter
 
 #### Gradle
 ```Gradle
-implementation 'in.unicodelabs.sorbh:kdgaugeview:1.0.0'
+implementation 'in.unicodelabs.sorbh:getpermission:1.0.0'
 ```
 
 #### Maven
 ```Gradle
 <dependency>
   <groupId>in.unicodelabs.sorbh</groupId>
-  <artifactId>kdgaugeview</artifactId>
+  <artifactId>getpermission</artifactId>
   <version>1.0.0</version>
   <type>pom</type>
 </dependency>
@@ -36,51 +40,10 @@ implementation 'in.unicodelabs.sorbh:kdgaugeview:1.0.0'
 
 # Usage
 
-After Importing this library you can directly use this view in your view XML
-
-```java
-<in.unicodelabs.kdgaugeview.KdGaugeView
-                android:id="@+id/speedMeter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:speed_limit="75" />
-```
-# Customization
-  For now you can these custom attributes
-
-  * app:maxSpeed="180" - max speed for gauge(default = 180)
-  * app:minSpeed="0" - min speed for gauge(default = 0)
-  * app:speed="60" - speed for gauge
-  * app:speed_limit="90" - speed limit for gauge(default = 90)
-
-  * app:unitOfMeasurement="km/hr" - Speed unit for measurment for gauge(default = Km/Hr)
-
-  * app:animationTime="2000" - Animation time in ms
-
-  * app:speedTextSize="100dp" - Speed text size in the center of the gauge
-  * app:unitOfMeasurementTextSize="30dp" - Unit of measurement text size
-  * app:speedLimitTextSize="15dp" - Speed limit text size
-
-  * app:speedDialRingWidth="15dp" - Speed Dial ring width
-  * app:speedDialRingInnerPadding="15dp" - Padding between speed dial and division doted ring
-
-  * app:dialActiveColor="@color/dialActiveColor" - dial active ring color (default = #D3D3D3)
-  * app:dialInactiveColor="@color/dialInactiveColor" - dial inactive ring color (default = #E0E0E0)
-  * app:dialSpeedColor="@color/dialSpeedColor" - dial speed ring color (default = GREEN)
-  * app:dialSpeedAlertColor="@color/dialSpeedAlertColor" - dial speed alert ring color (default = RED)
-  * app:subDivisionCircleColor="@color/subDivisionCircleColor" - sub-division circle color (default = DKGRAY)
-  * app:divisionCircleColor="@color/divisionCircleColor" - division circle color (default = BLUE)
-  * app:speedTextColor="@color/speedTextColor" - speed text color (default = BLACK)
-  * app:unitOfMeasurementTextColor="@color/unitOfMeasurementTextColor" - unit of measurement text color (default = BLACK)
-  * app:speedLimitTextColor="@color/speedLimitTextColor" - speed limit text color (default = BLACK)
-
-
-
 # Screenshots
-![alt text](https://github.com/sorbh/kdgaugeView/blob/master/raw/1.jpeg)
+![alt text](https://github.com/sorbh/GetPermission/blob/master/raw/1.jpeg)
 
-![alt text](https://github.com/sorbh/kdgaugeView/blob/master/raw/demo.gif)
+![alt text](https://github.com/sorbh/GetPermission/blob/master/raw/demo.gif)
 
 # Author
   * **Saurabh K Sharma - [GIT](https://github.com/Sorbh)**
