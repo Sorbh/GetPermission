@@ -3,6 +3,7 @@ package in.unicodelabs.getpermissiondemo;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,12 +18,14 @@ import java.util.ArrayList;
 import in.unicodelabs.getpermission.GetPermission;
 import in.unicodelabs.getpermission.PermissionRequest;
 import in.unicodelabs.getpermission.PermissionRequestActivity;
+import in.unicodelabs.getpermission.interfaces.PermissionDeniedDelegate;
+import in.unicodelabs.getpermission.interfaces.PermissionRationalDelegate;
 import in.unicodelabs.getpermission.interfaces.PermissionResultCallback;
 
 public class MainActivity extends AppCompatActivity {
     Context context;
-    Button contactBtn;
-    TextView contactTv;
+    Button locationBtn, contactBtn, audioBtn, bothBtn;
+    TextView locationTv, contactTv, audioTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +35,14 @@ public class MainActivity extends AppCompatActivity {
         context = this;
 
         contactBtn = (Button) findViewById(R.id.contactBtn);
+        locationBtn = (Button) findViewById(R.id.locationBtn);
+        audioBtn = (Button) findViewById(R.id.audioBtn);
+        bothBtn = (Button) findViewById(R.id.bothBtn);
+
         contactTv = (TextView) findViewById(R.id.contactTv);
+        locationTv = (TextView) findViewById(R.id.locationTv);
+        audioTv = (TextView) findViewById(R.id.audioTv);
+
 
         contactBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,51 +50,194 @@ public class MainActivity extends AppCompatActivity {
                 new GetPermission.Builder(context).setPermissions(Manifest.permission.READ_CONTACTS).enqueue(new PermissionResultCallback() {
                     @Override
                     public void onPermissionGranted(ArrayList<PermissionRequest> grantedPermission) {
-                        for (PermissionRequest permissionRequest : grantedPermission) {
-                            Log.d("Get Permission", "Granted - " + permissionRequest.getPermission());
-                        }
+                        PermissionRequest permissionRequest = grantedPermission.get(0);
+                        Log.d("Get Permission", "Granted - " + permissionRequest.getPermission());
+
+                        contactTv.setText("Granted");
+                        contactTv.setTextColor(Color.GREEN);
                     }
 
                     @Override
-                    public void onPermissionDenied(ArrayList<PermissionRequest> deniedPermission, final PermissionRequest.AskPermissionInterface askPermissionInterface) {
-                        for (PermissionRequest permissionRequest : deniedPermission) {
-                            Log.d("Get Permission", "Denied - " + permissionRequest.getPermission());
-                            if(permissionRequest.isPermanentlyDenied()){
-                                    askPermissionInterface.showSetting();
+                    public void onPermissionDenied(ArrayList<PermissionRequest> deniedPermission, PermissionDeniedDelegate permissionDeniedDelegate) {
+                        PermissionRequest permissionRequest = deniedPermission.get(0);
+                        Log.d("Get Permission", "Denied - " + permissionRequest.getPermission());
+
+                        contactTv.setText("Denied");
+                        contactTv.setTextColor(Color.RED);
+                    }
+
+                    @Override
+                    public void onPermissionRationalShouldShow(final ArrayList<PermissionRequest> rationalPermission, final PermissionRationalDelegate permissionRationalDelegate) {
+                        PermissionRequest permissionRequest = rationalPermission.get(0);
+                        Log.d("Get Permission", "Rational - " + permissionRequest.getPermission());
+
+                        contactTv.setText("Rational");
+                        contactTv.setTextColor(Color.RED);
+                    }
+                });
+            }
+        });
+        bothBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new GetPermission.Builder(context).setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO).enqueue(new PermissionResultCallback() {
+                    @Override
+                    public void onPermissionGranted(ArrayList<PermissionRequest> grantedPermission) {
+                        for (PermissionRequest permissionRequest : grantedPermission) {
+                            Log.d("Get Permission", "Granted - " + permissionRequest.getPermission());
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                locationTv.setText("Granted");
+                                locationTv.setTextColor(Color.GREEN);
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Granted");
+                                audioTv.setTextColor(Color.GREEN);
                             }
                         }
                     }
 
                     @Override
-                    public void onPermissionRationalShouldShow(final ArrayList<PermissionRequest> rationalPermission, final PermissionRequest.AskPermissionInterface askPermissionInterface) {
+                    public void onPermissionDenied(ArrayList<PermissionRequest> deniedPermission, final PermissionDeniedDelegate permissionDeniedDelegate) {
+                        for (final PermissionRequest permissionRequest : deniedPermission) {
+                            Log.d("Get Permission", "Denied - " + permissionRequest.getPermission());
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                locationTv.setText("Denied");
+                                locationTv.setTextColor(Color.RED);
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Denied");
+                                audioTv.setTextColor(Color.RED);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationalShouldShow(final ArrayList<PermissionRequest> rationalPermission, final PermissionRationalDelegate permissionRationalDelegate) {
                         for (final PermissionRequest permissionRequest : rationalPermission) {
                             Log.d("Get Permission", "Rational - " + permissionRequest.getPermission());
 
-                            AlertDialog alertDialog = new AlertDialog.Builder(context)
-                                    .setMessage("Message")
-                                    .setCancelable(true)
-                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.dismiss();
-//                                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{permissionRequest.getPermission()}, 110);
-//                                            permissionRequest.getAskPermissionInterface().requestPermission(permissionRequest,110);
-                                            askPermissionInterface.requestPermission(permissionRequest, 110);
-                                        }
-                                    })
-                                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.cancel();
-                                        }
-                                    })
-                                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialogInterface) {
-                                            dialogInterface.dismiss();
-                                        }
-                                    })
-                                    .show();
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                locationTv.setText("Rational");
+                                locationTv.setTextColor(Color.RED);
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Rational");
+                                audioTv.setTextColor(Color.RED);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new GetPermission.Builder(context).setPermissions(Manifest.permission.ACCESS_FINE_LOCATION).enqueue(new PermissionResultCallback() {
+                    @Override
+                    public void onPermissionGranted(ArrayList<PermissionRequest> grantedPermission) {
+                        for (PermissionRequest permissionRequest : grantedPermission) {
+                            Log.d("Get Permission", "Granted - " + permissionRequest.getPermission());
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                locationTv.setText("Granted");
+                                locationTv.setTextColor(Color.GREEN);
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Granted");
+                                audioTv.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionDenied(ArrayList<PermissionRequest> deniedPermission, final PermissionDeniedDelegate permissionDeniedDelegate) {
+                        for (final PermissionRequest permissionRequest : deniedPermission) {
+                            Log.d("Get Permission", "Denied - " + permissionRequest.getPermission());
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                                        .setTitle("Need Location Permission")
+                                        .setMessage("Waring Message to Show user")
+                                        .setCancelable(true)
+                                        .setPositiveButton("Open Setting", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                                if (permissionRequest.isPermanentlyDenied())
+                                                    permissionDeniedDelegate.openSetting();
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.cancel();
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialogInterface) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        })
+                                        .show();
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Denied");
+                                audioTv.setTextColor(Color.RED);
+                            } else {
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationalShouldShow(final ArrayList<PermissionRequest> rationalPermission, final PermissionRationalDelegate permissionRationalDelegate) {
+                        for (final PermissionRequest permissionRequest : rationalPermission) {
+                            Log.d("Get Permission", "Rational - " + permissionRequest.getPermission());
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                                        .setTitle("Need Location Permission")
+                                        .setMessage("Rational Message to Show user")
+                                        .setCancelable(true)
+                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                                permissionRationalDelegate.requestPermission(permissionRequest, 110);
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.cancel();
+                                            }
+                                        })
+                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialogInterface) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        })
+                                        .show();
+                            }
+
+                            if (permissionRequest.getPermission().equalsIgnoreCase(Manifest.permission.RECORD_AUDIO)) {
+                                audioTv.setText("Rational");
+                                audioTv.setTextColor(Color.RED);
+                            } else {
+
+                            }
+
+
                         }
                     }
                 });

@@ -16,10 +16,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import in.unicodelabs.getpermission.interfaces.PermissionDeniedDelegate;
+import in.unicodelabs.getpermission.interfaces.PermissionRationalDelegate;
 import in.unicodelabs.getpermission.interfaces.PermissionResultCallback;
 
 
-public class GetPermission implements PermissionRequest.AskPermissionInterface {
+public class GetPermission implements PermissionRationalDelegate, PermissionDeniedDelegate {
     Context context;
     ArrayList<PermissionRequest> permissionRequests = new ArrayList<>();
     int requestCode;
@@ -57,7 +59,7 @@ public class GetPermission implements PermissionRequest.AskPermissionInterface {
                     }
 
                     if (!deniedPermission.isEmpty()) {
-                        callback.onPermissionDenied(deniedPermission,GetPermission.this);
+                        callback.onPermissionDenied(deniedPermission, GetPermission.this);
                     }
 
                     if (!rationalPermission.isEmpty()) {
@@ -77,24 +79,29 @@ public class GetPermission implements PermissionRequest.AskPermissionInterface {
             protected void onReceiveResult(int resultCode, Bundle resultData) {
                 super.onReceiveResult(resultCode, resultData);
 
-//                if(!grantedPermission.isEmpty()){
+//                ArrayList<PermissionRequest> grantedPermission = (ArrayList<PermissionRequest>) resultData.getSerializable(PermissionConstant.Bundle.GRANTED_PERMISSIONS);
+//                ArrayList<PermissionRequest> deniedPermission = (ArrayList<PermissionRequest>) resultData.getSerializable(PermissionConstant.Bundle.DENIED_PERMISSIONS);
+//                ArrayList<PermissionRequest> rationalPermission = (ArrayList<PermissionRequest>) resultData.getSerializable(PermissionConstant.Bundle.RATIONAL_PERMISSIONS);
+//
+//                if (!grantedPermission.isEmpty()) {
 //                    callback.onPermissionGranted(grantedPermission);
 //                }
 //
-//                if(!deniedPermission.isEmpty()){
-//                    callback.onPermissionDenied(deniedPermission);
+//                if (!deniedPermission.isEmpty()) {
+//                    callback.onPermissionDenied(deniedPermission, GetPermission.this);
 //                }
 //
-//                if(!rationalPermission.isEmpty()){
-//                    callback.onPermissionRationalShouldShow(rationalPermission);
+//                if (!rationalPermission.isEmpty()) {
+//                    callback.onPermissionRationalShouldShow(rationalPermission, GetPermission.this);
 //                }
 
             }
         });
     }
 
+
     @Override
-    public void showSetting() {
+    public void openSetting() {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.addCategory(Intent.CATEGORY_DEFAULT);

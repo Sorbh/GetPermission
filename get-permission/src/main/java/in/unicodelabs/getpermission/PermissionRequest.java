@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class PermissionRequest implements Serializable {
     private final String name;
     private boolean isPermanentlyDenied = false;
-    private AskPermissionInterface askPermissionInterface;
 
     public PermissionRequest(@NonNull String name) {
         this.name = name;
@@ -29,21 +28,5 @@ public class PermissionRequest implements Serializable {
 
     public void setPermanentlyDenied(boolean permanentlyDenied) {
         isPermanentlyDenied = permanentlyDenied;
-    }
-
-    public AskPermissionInterface getAskPermissionInterface() {
-        return askPermissionInterface;
-    }
-
-    public void setAskPermissionInterface(AskPermissionInterface askPermissionInterface) {
-        this.askPermissionInterface = askPermissionInterface;
-    }
-
-    public interface AskPermissionInterface {
-
-        void requestPermission(PermissionRequest permissionRequest, int requestCode);
-
-        void showSetting();
-
     }
 }

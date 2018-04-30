@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +63,9 @@ public class PermissionRequestActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         if (getIntent() != null) {
+
             resultReceiver = getIntent().getParcelableExtra(PermissionConstant.Bundle.RESULT_RECEIVER);
+
             int requestCode = getIntent().getIntExtra(PermissionConstant.Bundle.REQUEST_CODE, 0);
 
             if (getIntent().hasExtra(PermissionConstant.Bundle.PERMISSIONS)) {
@@ -116,26 +119,32 @@ public class PermissionRequestActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        ArrayList<PermissionRequest> tempDeniedList =  new ArrayList<>();
+
         for (int i = 0; grantResults.length > i; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                 // This is Case 2 (Permission is now granted) and Case 6
                 //Remove the permission from denied list and add it to granted list
-                grantedPermission.add(deniedPermission.remove(i));
+                grantedPermission.add(deniedPermission.get(i));
             } else {
                 // This is Case 1 again as Permission is not granted by user
 
                 //Now further we check if used denied permanently or not
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, deniedPermission.get(i).getPermission())) {
                     // case 4 User has denied permission but not permanently
-                    rationalPermission.add(deniedPermission.remove(i));
+                    rationalPermission.add(deniedPermission.get(i));
                 } else {
                     // case 5. Permission denied permanently.
                     // You can open Permission setting's page from here now.
                     // let me permission be in denied list and ask user if they want to open setting dialog
                     deniedPermission.get(i).setPermanentlyDenied(true);
+                    tempDeniedList.add(deniedPermission.get(i));
                 }
             }
         }
+
+        deniedPermission.clear();
+        deniedPermission.addAll(tempDeniedList);
 
         ArrayList<PermissionRequest> permissionRequests = new ArrayList<>();
         for (String permission : permissions) {
